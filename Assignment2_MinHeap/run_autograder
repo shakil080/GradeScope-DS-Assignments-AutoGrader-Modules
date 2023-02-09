@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+cd /autograder/source
+
+# Copy the student's code into the autograder directory. Make sure
+# student has the right package name in their file and that it's in
+# the right place
+cp /autograder/submission/MinHeap.java /autograder/source/ 2> copy_error.txt
+
+bash ./replaceText.sh
+
+# Compile the student's code with autograder code
+bash ./compile.sh
+
+if [ -s "copy_error.txt" ] 
+then
+	# Create a json file for copy errors 
+        echo \{ \"score\": .5.0, \"output\": \"Error Copying Files. Make sure your files and packages are as stated in the Assignment \" \} > /autograder/results/results.json       
+elif [ -s "compile_output.txt" ] 
+then
+	# Create a json file for compilation errors 
+        echo \{ \"score\": 1.0, \"output\": \"Error compiling. Make sure the method names, arguments etc are as stated in the Assignment > /autograder/results/results.json        
+        echo $(cat compile_output.txt) >> /autograder/results/results.json
+        echo \" \} >> /autograder/results/results.json
+else
+	# Run the autograder code
+        bash ./run.sh > /autograder/results/results.json  
+fi 
